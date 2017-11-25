@@ -3,6 +3,10 @@
 // Import the module and reference it with the alias vscode in your code below
 import * as vscode from 'vscode';
 
+import {IncrementNumberAction} from './actions/commands/actions';
+import {Position} from './common/motion/position';
+import {VimState} from './mode/modeHandler';
+
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
 export function activate(context: vscode.ExtensionContext) {
@@ -14,11 +18,15 @@ export function activate(context: vscode.ExtensionContext) {
     // The command has been defined in the package.json file
     // Now provide the implementation of the command with  registerCommand
     // The commandId parameter must match the command field in package.json
-    let disposable = vscode.commands.registerCommand('extension.sayHello', () => {
-        // The code you place here will be executed every time your command is executed
+    let disposable = vscode.commands.registerCommand('extension.normal', async () => {
+        const action:IncrementNumberAction = new IncrementNumberAction();
 
-        // Display a message box to the user
-        vscode.window.showInformationMessage('Hello World!');
+        const position = Position.FromVSCodePosition(
+            vscode.window.activeTextEditor.selection.start
+        );
+        const state = new VimState();
+        const result = await action.exec(position, state);
+        console.log(result);
     });
 
     context.subscriptions.push(disposable);
